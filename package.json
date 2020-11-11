@@ -1,0 +1,32 @@
+{
+  "name": "node-red-contrib-datastack",
+  "version": "0.0.1",
+  "description": "Simple Node-RED nodes for interacting with the Datastack API.",
+  "author": "Joakim Lundin <joakim.lundin@gmail.com>",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iceglow/node-red-contrib-deepstack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iceglow/node-red-contrib-deepstack/issues"
+  },
+  "homepage": "https://github.com/iceglow/node-red-contrib-deepstack#readme",
+  "main": "deepstack-object-detection.js",
+  "keywords": [
+    "node-red",
+    "deepstack"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "node-red": {
+    "nodes": {
+      "deepstack-object-detection": "deepstack-object-detection.js"
+    }
+  },
+  "dependencies": {
+    "form-data": "^3.0.0",
+    "got": "^11.8.0"
+  }
+}
