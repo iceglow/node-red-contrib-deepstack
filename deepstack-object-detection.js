@@ -32,8 +32,11 @@ module.exports = function(RED) {
                         return p.label == filter;
                     });
 
-                    filterOutput = JSON.parse(JSON.stringify(msg));
-                    filterOutput.payload = filterResult;
+                    let filterOutput = undefined;
+                    if (filterResult.length > 0) {
+                        filterOutput = JSON.parse(JSON.stringify(msg));
+                        filterOutput.payload = filterResult;
+                    }
                     outputs.push(filterOutput);
                 });
 

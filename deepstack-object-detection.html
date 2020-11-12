@@ -68,18 +68,18 @@
                     rules.each(function(i) {
                         $(this).find(".node-input-filter-index").html(i+1);
                         var data = $(this).data('data');
-                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i;
+                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i+1;
                     });
                     outputCount.val(JSON.stringify(currentOutputs));
                 },
                 resizeItem: resizeRule,
-                sortItems: function(rules) {
+                sortItems: function(opt) {
                     var currentOutputs = JSON.parse(outputCount.val()||"{}");
                     var filters = $("#node-input-filter-container").editableList('items');
                     filters.each(function(i) {
                         $(this).find(".node-input-filter-index").html(i+1);
                         var data = $(this).data('data');
-                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i;
+                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i+1;
                     });
                     outputCount.val(JSON.stringify(currentOutputs));
                 },
