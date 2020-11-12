@@ -16,17 +16,32 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         let node = this;
 
-        node.status({fill:"grey",shape:"dot",text:"idel"});
+        node.status({fill:"grey",shape:"dot",text:"idling"});
         node.on('input', function(msg, send, done) {
             node.status({fill:"yellow",shape:"ring",text:"Processing..."});
+            let originalImage = msg.payload;
+
             detect(function (result) {
-                msg.payload = result;
+                msg.payload = result.predictions;
+                msg.success = result.success;
+                msg.originalImage = originalImage;
+                let outputs = [msg];
+
+                config.filters.forEach(function(filter) {
+                    let filterResult = result.predictions.filter(function (p) {
+                        return p.label == filter;
+                    });
+
+                    filterOutput = JSON.parse(JSON.stringify(msg));
+                    filterOutput.payload = filterResult;
+                    outputs.push(filterOutput);
+                });
 
                 node.status({fill:"green",shape:"dot",text:"success"});
                 setTimeout(function() {
-                    node.status({fill:"grey",shape:"dot",text:"idel"});
+                    node.status({fill:"grey",shape:"dot",text:"idling"});
                 }, 2000);
-                node.send(msg);
+                node.send(outputs);
             },
                 msg, {url: config.url, rejectUnauthorized: config.rejectUnauthorized}, node)
         });
@@ -46,16 +61,11 @@ function detect(cb, msg, options, node) {
         headers: form.getHeaders(),
         body: form
     }).then( function (response) {
-        const result = {
-            deepstackResponse: JSON.parse(response.body),
-            originalImage: image
-        }
-
-        cb(result);
+        cb(JSON.parse(response.body));
     }).catch( function (err) {
         node.status({fill:"red",shape:"ring",text:"error detecting objects"});
         setTimeout(function() {
-            node.status({fill:"grey",shape:"dot",text:"idel"});
+            node.status({fill:"grey",shape:"dot",text:"idling"});
         }, 2000);
         node.error(err);
         console.log(err)

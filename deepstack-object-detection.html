@@ -5,22 +5,121 @@
         defaults: {
             name: {value:""},
             url: {value:""},
-            rejectUnauthorized: {value: true}
+            rejectUnauthorized: {value: true},
+            filters: {value:[""]},
+            outputs: {value:1}
         },
         inputs:1,
         outputs:1,
+        outputLabels: function(index) {
+            let label = "";
+            if (index == 0) {
+                label = 'All Predictions';
+            } else {
+                label = 'Filter: ' + this.filters[index-1];
+            }
+            return label;
+        },
         icon: "font-awesome/fa-file-image-o",
         label: function() {
             return this.name||"Object Detection";
         },
-        credentials: {}
+        credentials: {},
+        oneditprepare: function() {
+            var node = this;
+
+            var outputCount = $("#node-input-outputs").val("{\"0\":0}");
+
+            function resizeRule(rule) {
+                var newWidth = rule.width();
+                var valueField = rule.find(".node-input-filter-value");
+                valueField.typedInput("width",(newWidth-70));
+            }
+
+            $("#node-input-filter-container").css('min-height','150px').css('min-width','450px').editableList({
+                addItem: function(container,i,opt) {
+                    container.css({
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
+                    });
+                    if (!opt.hasOwnProperty('i')) {
+                        opt._i = Math.floor((0x99999-0x10000)*Math.random()).toString();
+                    }
+
+                    var row = $('<div/>').appendTo(container);
+
+                    $('<input/>',{class:"node-input-filter-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['str']}).typedInput('value',opt.v);
+
+                    var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
+                    finalspan.append(' &#8594; <span class="node-input-filter-index">'+(i+2)+'</span> ');
+
+                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
+                    currentOutputs[opt.hasOwnProperty('i')?opt.i:opt._i] = i+1;
+                    outputCount.val(JSON.stringify(currentOutputs));
+                },
+                removeItem: function(opt) {
+                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
+                    if (opt.hasOwnProperty('i')) {
+                        currentOutputs[opt.i] = -1;
+                    } else {
+                        delete currentOutputs[opt._i];
+                    }
+                    var rules = $("#node-input-filter-container").editableList('items');
+                    rules.each(function(i) {
+                        $(this).find(".node-input-filter-index").html(i+1);
+                        var data = $(this).data('data');
+                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i;
+                    });
+                    outputCount.val(JSON.stringify(currentOutputs));
+                },
+                resizeItem: resizeRule,
+                sortItems: function(rules) {
+                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
+                    var filters = $("#node-input-filter-container").editableList('items');
+                    filters.each(function(i) {
+                        $(this).find(".node-input-filter-index").html(i+1);
+                        var data = $(this).data('data');
+                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i;
+                    });
+                    outputCount.val(JSON.stringify(currentOutputs));
+                },
+                sortable: true,
+                removable: true
+            });
+
+            for (var i=0;i<this.filters.length;i++) {
+                var filter = this.filters[i];
+                $("#node-input-filter-container").editableList('addItem',{v: filter, i: i+1});
+            }
+        },
+        oneditsave: function() {
+            var filters = $("#node-input-filter-container").editableList('items');
+            var node = this;
+            node.filters = [];
+            filters.each(function(i) {
+                var value = $(this).find(".node-input-filter-value").typedInput('value');
+                node.filters.push(value);
+            });
+            this.propertyType = $("#node-input-property").typedInput('type');
+        },
+        oneditresize: function(size) {
+            var rows = $("#dialog-form>div:not(.node-input-filter-container-row)");
+            var height = size.height;
+            for (var i=0;i<rows.length;i++) {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var editorRow = $("#dialog-form>div.node-input-filter-container-row");
+            height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
+            height += 16;
+            $("#node-input-filter-container").editableList('height',height);
+        }
     });
 </script>
 
 <script type="text/x-red" data-template-name="deepstack-object-detection">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
     </div>
     <div class="form-row">
         <label for="node-input-url"><i class="icon-tag"></i> URL</label>
@@ -30,6 +129,14 @@
         <hr />
         <input type="checkbox" id="node-input-rejectUnauthorized" style="display: inline-block; width: auto; vertical-align: top;">
         <label for="node-input-rejectUnauthorized" style="width: 90%;">Reject unauthorized</label>
+    </div>
+    <div class="form-row">
+        <hr />
+        <p>Filter output</p>
+        <input type="hidden" id="node-input-outputs"/>
+    </div>
+    <div class="form-row node-input-filter-container-row">
+        <ol id="node-input-filter-container"></ol>
     </div>
 </script>
 
