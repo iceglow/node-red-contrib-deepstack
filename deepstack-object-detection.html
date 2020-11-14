@@ -5,8 +5,10 @@
         defaults: {
             name: {value:""},
             url: {value:""},
-            rejectUnauthorized: {value: true},
-            filters: {value:[""]},
+            rejectUnauthorized: {value: false},
+            drawPredictions: {value: false},
+            outlineColor: {value: 'pink'},
+            filters: {value:[]},
             outputs: {value:1}
         },
         inputs:1,
@@ -91,6 +93,14 @@
                 var filter = this.filters[i];
                 $("#node-input-filter-container").editableList('addItem',{v: filter, i: i+1});
             }
+
+            if (! $("#node-input-drawPredictions").is(":checked")) {
+                $("#row-outlineColor").hide();
+            }
+
+            $("#node-input-drawPredictions").click(function() {
+                $("#row-outlineColor").toggle(this.checked);
+            });
         },
         oneditsave: function() {
             var filters = $("#node-input-filter-container").editableList('items');
@@ -125,10 +135,18 @@
         <label for="node-input-url"><i class="icon-tag"></i> URL</label>
         <input type="text" id="node-input-url">
     </div>
-    <div class="form-row" id="node-reg-row">
-        <hr />
+    <hr />
+    <div class="form-row">
         <input type="checkbox" id="node-input-rejectUnauthorized" style="display: inline-block; width: auto; vertical-align: top;">
         <label for="node-input-rejectUnauthorized" style="width: 90%;">Reject unauthorized</label>
+    </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-drawPredictions" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-drawPredictions" style="width: 90%;">Draw prediction outlines</label>
+    </div>
+    <div class="form-row" id="row-outlineColor" style="padding-left:10%;">
+        <label for="node-input-outlineColor"><i class="icon-tag"></i> Outline color</label>
+        <input type="text" id="node-input-outlineColor">
     </div>
     <div class="form-row">
         <hr />

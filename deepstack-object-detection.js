@@ -1,5 +1,6 @@
 const got = require('got');
 const FormData = require('form-data');
+const sharp = require('sharp');
 
 /*
  * Object Detection node
@@ -19,58 +20,115 @@ module.exports = function(RED) {
         node.status({fill:"grey",shape:"dot",text:"idling"});
         node.on('input', function(msg, send, done) {
             node.status({fill:"yellow",shape:"ring",text:"Processing..."});
-            let originalImage = msg.payload;
 
-            detect(function (result) {
-                msg.payload = result.predictions;
-                msg.success = result.success;
-                msg.originalImage = originalImage;
-                let outputs = [msg];
-
-                config.filters.forEach(function(filter) {
-                    let filterResult = result.predictions.filter(function (p) {
-                        return p.label == filter;
-                    });
-
-                    let filterOutput = undefined;
-                    if (filterResult.length > 0) {
-                        filterOutput = JSON.parse(JSON.stringify(msg));
-                        filterOutput.payload = filterResult;
-                    }
-                    outputs.push(filterOutput);
-                });
-
-                node.status({fill:"green",shape:"dot",text:"success"});
-                setTimeout(function() {
-                    node.status({fill:"grey",shape:"dot",text:"idling"});
+            objectDetection(msg, config).then(outputs =>{
+                node.status({fill: "green", shape: "dot", text: "success"});
+                setTimeout(function () {
+                    node.status({fill: "grey", shape: "dot", text: "idling"});
                 }, 2000);
+
                 node.send(outputs);
-            },
-                msg, {url: config.url, rejectUnauthorized: config.rejectUnauthorized}, node)
+            }).catch(reason => {
+                node.status({fill:"red",shape:"ring",text:"error detecting objects"});
+                node.error(reason);
+                console.log(reason);
+            });
         });
     }
     RED.nodes.registerType("deepstack-object-detection", ObjectDetection, {});
 };
 
-function detect(cb, msg, options, node) {
+function objectDetection(msg, config) {
 
-    const image = msg.payload;
+    let original = msg.payload;
 
+    return new Promise((resolve, reject) => {
+
+        deepstackDetection(
+            msg.payload,
+            config.url,
+            config.rejectUnauthorized
+        ).then(async result => {
+            msg.payload = result.predictions;
+            msg.success = result.success;
+            msg.originalImage = original;
+            if (config.drawPredictions) {
+                msg.outlinedImage = await outlineImage(
+                    original,
+                    getOutlines(result.predictions),
+                    config.outlineColor);
+            }
+
+            let outputs = [msg];
+
+            for (let i = 0; i < config.filters.length; i++){
+                let filterResult = result.predictions.filter(function (p) {
+                    return p.label == config.filters[i];
+                });
+
+                let filterOutput = undefined;
+                if (filterResult.length > 0) {
+                    filterOutput = JSON.parse(JSON.stringify(msg));
+                    filterOutput.payload = filterResult;
+                    if (config.drawPredictions) {
+                        filterOutput.outlinedImage = await outlineImage(
+                            original,
+                            getOutlines(filterResult),
+                            config.outlineColor);
+                    }
+                }
+                outputs.push(filterOutput);
+            }
+
+            resolve(outputs);
+        }).catch(reject);
+    });
+}
+
+function deepstackDetection(image, url, rejectUnauthorized) {
     const form = new FormData();
     form.append('image', image,{ filename: 'image.jpg' });
 
-    got(options.url + '/vision/detection', {
-        method: 'POST',
-        headers: form.getHeaders(),
-        body: form
-    }).then( function (response) {
-        cb(JSON.parse(response.body));
-    }).catch( function (err) {
-        node.status({fill:"red",shape:"ring",text:"error detecting objects"});
-        setTimeout(function() {
-            node.status({fill:"grey",shape:"dot",text:"idling"});
-        }, 2000);
-        node.error(err);
-        console.log(err)
+    return new Promise((resolve, reject) => {
+        got(url + '/vision/detection', {
+            method: 'POST',
+            headers: form.getHeaders(),
+            https: {
+                rejectUnauthorized: rejectUnauthorized
+            },
+            body: form
+        }).then( function (response) {
+            resolve(JSON.parse(response.body));
+        }).catch(reject);
     });
+}
+
+function outlineImage(buffer, outlines, outlineColor) {
+    return sharp(buffer).metadata().then(meta => {
+        let svgOverlay = '';
+
+        outlines.forEach(o => {
+            svgOverlay += '<rect x="' + o.x + '" y="' + o.y + '" width="' + o.width + '" height="' + o.height + '" ' +
+                'style="fill:none;stroke:' + outlineColor + ';stroke-width:3;" />';
+        });
+        return '<svg width="' + meta.width + '" height="' + meta.height + '">' + svgOverlay + '</svg>';
+    }).then(overlay => {
+        return sharp(buffer).composite([{
+            input: Buffer.from(overlay),
+            blend: 'over'
+        }]).toBuffer();
+    });
+}
+
+function getOutlines(prediction) {
+    if (prediction instanceof Array) {
+        return prediction.map(p => getOutlines(p));
+    } else {
+        return {
+            x: prediction.x_min,
+            y: prediction.y_min,
+            width: prediction.x_max - prediction.x_min,
+            height: prediction.y_max - prediction.y_min
+        }
+    }
 }
