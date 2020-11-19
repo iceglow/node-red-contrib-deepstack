@@ -38,6 +38,13 @@ module.exports = function(RED) {
     RED.nodes.registerType("deepstack-object-detection", ObjectDetection, {});
 };
 
+/**
+ * Construct the object detection outputs.
+ *
+ * @param msg the incomming msg object.
+ * @param config the node configuration.
+ * @returns {Promise<unknown>}
+ */
 function objectDetection(msg, config) {
 
     let original = msg.payload;
@@ -45,7 +52,7 @@ function objectDetection(msg, config) {
     return new Promise((resolve, reject) => {
 
         deepstackDetection(
-            msg.payload,
+            original,
             config.url,
             config.rejectUnauthorized
         ).then(async result => {
@@ -85,6 +92,14 @@ function objectDetection(msg, config) {
     });
 }
 
+/**
+ * Call the Deepstack API and return Promise with response body as JSON.
+ *
+ * @param image the image buffer to send to the Deepstack API.
+ * @param url the base URL of the Deepstack service.
+ * @param rejectUnauthorized if not false, the server certificate is verified against the list of supplied CAs
+ * @returns {Promise<unknown>}
+ */
 function deepstackDetection(image, url, rejectUnauthorized) {
     const form = new FormData();
     form.append('image', image,{ filename: 'image.jpg' });
@@ -103,6 +118,14 @@ function deepstackDetection(image, url, rejectUnauthorized) {
     });
 }
 
+/**
+ * Paint outlines on the supplied picture.
+ *
+ * @param buffer image buffer to painnt outlines on.
+ * @param outlines the outlines to paint. {x: *, width: number, y: *, height: number}
+ * @param outlineColor color to use for the outline.
+ * @returns {PromiseLike<T>}
+ */
 function outlineImage(buffer, outlines, outlineColor) {
     return sharp(buffer).metadata().then(meta => {
         let svgOverlay = '';
@@ -120,6 +143,12 @@ function outlineImage(buffer, outlines, outlineColor) {
     });
 }
 
+/**
+ * Calculate where to place the outlines.
+ *
+ * @param prediction the prediction/predictions to calculate for.
+ * @returns {{x: *, width: number, y: *, height: number}[]|{x: *, width: number, y: *, height: number}}
+ */
 function getOutlines(prediction) {
     if (prediction instanceof Array) {
         return prediction.map(p => getOutlines(p));

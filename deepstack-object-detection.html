@@ -160,4 +160,51 @@
 
 <script type="text/x-red" data-help-name="deepstack-object-detection">
     <p>A node to query the Deepstack Object Detection API.</p>
+
+    <h3>Inputs</h3>
+    <p>At this moment no inputs used.</p>
+
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">buffer</span>
+        </dt>
+        <dd> the image buffer to process. </dd>
+    </dl>
+
+    <h3>Outputs</h3>
+
+    <ol class="node-ports">
+        <li>Standard output
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">object</span></dt>
+                <dd>Deepstack Object Detection predictions.</dd>
+                <dt>success <span class="property-type">boolean</span></dt>
+                <dd>Deepstack Object Detection status.</dd>
+                <dt>originalImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer processed.</dd>
+                <dt>outlinedImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer with rectangular outline around detected objects. Only if config option *drawPredictions* is true.</dd>
+            </dl>
+        </li>
+        <li>Filtered output
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">object</span></dt>
+                <dd>Deepstack Object Detection predictions.</dd>
+                <dt>success <span class="property-type">boolean</span></dt>
+                <dd>Deepstack Object Detection status.</dd>
+                <dt>originalImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer processed.</dd>
+                <dt>outlinedImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer with rectangular outline around detected objects. Only if config option *drawPredictions* is true.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Details</h3>
+    <p>Sends an image to the Deepstack Object Detection API and outputs the predictions.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://deepstack.cc/">Deepstack</a> - the service performing the actual magic.</li>
+    </ul>
 </script>
