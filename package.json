@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-deepstack",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Simple Node-RED nodes for interacting with the Deepstack API.",
   "author": "Joakim Lundin <joakim.lundin@gmail.com>",
   "license": "BSD-3-Clause",
@@ -22,7 +22,8 @@
   },
   "node-red": {
     "nodes": {
-      "deepstack-object-detection": "deepstack-object-detection.js"
+      "deepstack-object-detection": "deepstack-object-detection.js",
+      "deepstack-face-recognition": "deepstack-face-recognition.js"
     }
   },
   "dependencies": {
