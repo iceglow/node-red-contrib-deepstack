@@ -37,7 +37,7 @@ function objectDetection(image, url, rejectUnauthorized) {
  */
 function faceRecognition(image, url, rejectUnauthorized) {
     const form = new FormData();
-    form.append('image', image,{ filename: 'image.jpg' });
+    form.append('image', image, {filename: 'image.jpg'});
 
     return new Promise((resolve, reject) => {
         got(url + '/vision/face/recognize', {

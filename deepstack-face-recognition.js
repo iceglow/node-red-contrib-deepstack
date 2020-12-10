@@ -48,8 +48,12 @@ function faceRecognition(msg, config) {
 
     let original = msg.payload;
 
-    return new Promise((resolve, reject) => {
+    if (original.type === 'Buffer') {
+        original = Buffer.from(original.data)
+    }
 
+    return new Promise((resolve, reject) => {
+        
         deepstack.faceRecognition(
             original,
             config.url,
