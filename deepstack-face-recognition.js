@@ -1,3 +1,5 @@
+const clonedeep = require('lodash.clonedeep')
+
 const deepstack = require('./deepstack-integration');
 const im = require('./image-manipulation');
 
@@ -78,7 +80,7 @@ function faceRecognition(msg, config) {
 
                 let filterOutput = undefined;
                 if (filterResult.length > 0) {
-                    filterOutput = JSON.parse(JSON.stringify(msg));
+                    filterOutput = clonedeep(msg);
                     filterOutput.payload = filterResult;
                     if (config.drawPredictions) {
                         filterOutput.outlinedImage = await im.outlineImage(
