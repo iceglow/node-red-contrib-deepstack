@@ -48,6 +48,10 @@ function objectDetection(msg, config) {
 
     let original = msg.payload;
 
+    if (original.type === 'Buffer') {
+        original = Buffer.from(original.data)
+    }
+
     return new Promise((resolve, reject) => {
 
         deepstack.objectDetection(
