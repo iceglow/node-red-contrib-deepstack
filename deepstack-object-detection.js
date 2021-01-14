@@ -59,7 +59,8 @@ function objectDetection(msg, config) {
         deepstack.objectDetection(
             original,
             config.url,
-            config.rejectUnauthorized
+            config.rejectUnauthorized,
+            config.confidence/100
         ).then(async result => {
             msg.payload = result.predictions;
             msg.success = result.success;

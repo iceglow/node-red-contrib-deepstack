@@ -9,9 +9,10 @@ const FormData = require('form-data');
  * @param rejectUnauthorized if not false, the server certificate is verified against the list of supplied CAs
  * @returns {Promise<unknown>}
  */
-function objectDetection(image, url, rejectUnauthorized) {
+function objectDetection(image, url, rejectUnauthorized, confidence) {
     const form = new FormData();
     form.append('image', image, {filename: 'image.jpg'});
+    form.append('min_confidence', confidence);
 
     return new Promise((resolve, reject) => {
         got(url + '/vision/detection', {
