@@ -14,7 +14,7 @@ const im = require('./image-manipulation');
  */
 
 module.exports = function(RED) {
-    function ObjectDetection(config) {
+    function FaceRecognition(config) {
         RED.nodes.createNode(this, config);
         let node = this;
 
@@ -22,7 +22,7 @@ module.exports = function(RED) {
         node.on('input', function(msg, send, done) {
             node.status({fill:"yellow",shape:"ring",text:"Processing..."});
 
-            objectDetection(msg, config).then(outputs =>{
+            faceRecognition(msg, config).then(outputs =>{
                 node.status({fill: "green", shape: "dot", text: "success"});
                 setTimeout(function () {
                     node.status({fill: "grey", shape: "dot", text: "idling"});
@@ -36,7 +36,7 @@ module.exports = function(RED) {
             });
         });
     }
-    RED.nodes.registerType("deepstack-object-detection", ObjectDetection, {});
+    RED.nodes.registerType("deepstack-face-recognition", FaceRecognition, {});
 };
 
 /**
@@ -46,7 +46,7 @@ module.exports = function(RED) {
  * @param config the node configuration.
  * @returns {Promise<unknown>}
  */
-function objectDetection(msg, config) {
+function faceRecognition(msg, config) {
 
     let original = msg.payload;
 
@@ -55,12 +55,11 @@ function objectDetection(msg, config) {
     }
 
     return new Promise((resolve, reject) => {
-
-        deepstack.objectDetection(
+        
+        deepstack.faceRecognition(
             original,
             config.url,
-            config.rejectUnauthorized,
-            config.confidence/100
+            config.rejectUnauthorized
         ).then(async result => {
             msg.payload = result.predictions;
             msg.success = result.success;
@@ -76,7 +75,7 @@ function objectDetection(msg, config) {
 
             for (let i = 0; i < config.filters.length; i++){
                 let filterResult = result.predictions.filter(function (p) {
-                    return p.label == config.filters[i];
+                    return p.userid == config.filters[i];
                 });
 
                 let filterOutput = undefined;

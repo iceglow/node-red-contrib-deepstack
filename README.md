@@ -1,6 +1,26 @@
 # node-red-contrib-deepstack
 Simple Node-RED nodes for interacting with the Deepstack API.
 
+## Node Face Recognition
+Sends an image to the Deepstack Face Recognition API and outputs the predictions.
+
+### Inputs
+The input message should contain the image to process.
+
+**msg.payload**: Image buffer to process.
+
+### Outputs
+The first output always contain all predictions made by the Face Recognition API. If filters are configured, the corresponding outputs 2..* will contain predictions matching that particular filter. If there is no match, there will be no message on that output.
+
+**msg.payload**: Deepstack Face Recognition predictions.
+
+**msg.success**: Deepstack call status.
+
+**msg.originalImage**: The image buffer processed.
+
+**msg.outlinedImage**: Image buffer with rectangular outline around the faces. Only if config option
+*drawPredictions* is true.
+
 ## Node Object Detection
 Sends an image to the Deepstack Object Detection API and outputs the predictions.
 
@@ -10,11 +30,11 @@ The input message should contain the image to process.
 **msg.payload**: Image buffer to process.
 
 ### Outputs
-The first output always contain all predictions made by the Object Detection API. If filters are configured, the corresponding outputs 2..* will contain predictions matching that particular filter, if there is no match, there will be no message on that output.
+The first output always contain all predictions made by the Object Detection API. If filters are configured, the corresponding outputs 2..* will contain predictions matching that particular filter. If there is no match, there will be no message on that output.
 
 **msg.payload**: Deepstack Object Detection predictions.
 
-**msg.success**: Deepstack Object Detection status.
+**msg.success**: Deepstack call status.
 
 **msg.originalImage**: The image buffer processed.
 

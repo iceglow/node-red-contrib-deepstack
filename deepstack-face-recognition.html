@@ -1,11 +1,10 @@
 <script type="text/javascript">
-    RED.nodes.registerType('deepstack-object-detection',{
+    RED.nodes.registerType('deepstack-face-recognition',{
         category: 'function',
         color: '#4682b4',
         defaults: {
             name: {value:""},
             url: {value:""},
-            confidence: {value: 80},
             rejectUnauthorized: {value: false},
             drawPredictions: {value: false},
             outlineColor: {value: 'pink'},
@@ -23,9 +22,9 @@
             }
             return label;
         },
-        icon: "font-awesome/fa-file-image-o",
+        icon: "font-awesome/fa-user",
         label: function() {
-            return this.name||"Object Detection";
+            return this.name||"Face Recognition";
         },
         credentials: {},
         oneditprepare: function() {
@@ -127,7 +126,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="deepstack-object-detection">
+<script type="text/x-red" data-template-name="deepstack-face-recognition">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
@@ -137,10 +136,6 @@
         <input type="text" id="node-input-url">
     </div>
     <hr />
-    <div class="form-row">
-        <label for="node-input-confidence"><i class="icon-tag"></i> Minimum Confidence (%)</label>
-        <input type="text" id="node-input-confidence" size="5">
-    </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-rejectUnauthorized" style="display: inline-block; width: auto; vertical-align: top;">
         <label for="node-input-rejectUnauthorized" style="width: 90%;">Reject unauthorized</label>
@@ -163,7 +158,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="deepstack-object-detection">
+<script type="text/x-red" data-help-name="deepstack-face-recognition">
     <p>A node to query the Deepstack Object Detection API.</p>
 
     <h3>Inputs</h3>
