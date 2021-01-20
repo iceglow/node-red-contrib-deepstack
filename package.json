@@ -18,7 +18,7 @@
     "deepstack"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha \"test/**/*_spec.js\""
   },
   "node-red": {
     "nodes": {
@@ -32,5 +32,10 @@
     "got": "^11.8.0",
     "lodash.clonedeep": "^4.5.0",
     "sharp": "^0.26.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "nock": "^13.0.5"
   }
 }

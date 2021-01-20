@@ -16,6 +16,9 @@ function objectDetection(image, server, confidence) {
     if (server.credentials.apiKey) {
         form.append('api_key', server.credentials.apiKey);
     }
+    if (server.credentials.adminKey) {
+        form.append('admin_key', server.credentials.adminKey);
+    }
 
     return new Promise((resolve, reject) => {
         got(constructURL(server, '/vision/detection'), {
@@ -45,6 +48,9 @@ function faceRecognition(image, server, confidence) {
     form.append('min_confidence', confidence);
     if (server.credentials.apiKey) {
         form.append('api_key', server.credentials.apiKey);
+    }
+    if (server.credentials.adminKey) {
+        form.append('admin_key', server.credentials.adminKey);
     }
 
     return new Promise((resolve, reject) => {
@@ -81,7 +87,7 @@ function getOutlines(prediction) {
 };
 
 function constructURL(server, endpoint) {
-    return server.proto + '://' + server.host + ':' + server.port + '/v1' + endpoint;
+    return server.proto + '://' + server.host + ':' + server.port + '/' + server.version + endpoint;
 }
 
 module.exports = {

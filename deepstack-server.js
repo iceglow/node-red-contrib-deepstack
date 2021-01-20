@@ -10,6 +10,7 @@ module.exports = function(RED) {
     RED.nodes.registerType("deepstack-server", DeepstackServerNode, {
         credentials: {
             apiKey: {type: "text"},
+            adminKey: {type: "text"}
         }
     });
 }
