@@ -1,1 +1,126 @@
-[{"id":"efa58330.bbc59","type":"deepstack-face-recognition","z":"827a5cb1.8fbcf","name":"","url":"http://127.0.0.1:80/v1","confidence":"80","rejectUnauthorized":false,"drawPredictions":true,"outlineColor":"pink","filters":["joakim"],"outputs":2,"x":590,"y":200,"wires":[["e7fe002a.cf342"],["c1be0415.bdf658"]]},{"id":"a14d023a.5f2d8","type":"inject","z":"827a5cb1.8fbcf","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":140,"y":200,"wires":[["53bdebea.5f4164"]]},{"id":"e7fe002a.cf342","type":"debug","z":"827a5cb1.8fbcf","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":810,"y":180,"wires":[]},{"id":"c1be0415.bdf658","type":"debug","z":"827a5cb1.8fbcf","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":810,"y":220,"wires":[]},{"id":"53bdebea.5f4164","type":"file in","z":"827a5cb1.8fbcf","name":"","filename":"/Users/me/my_image.jpg","format":"","chunk":false,"sendError":false,"encoding":"none","x":350,"y":200,"wires":[["efa58330.bbc59"]]},{"id":"76ab6c52.8cd014","type":"comment","z":"827a5cb1.8fbcf","name":"Sample object detection","info":"Sends an image for face recognition to a local deepstack instance.\n\nWorks good with the example image from the Deepstack Face Recognition documentation (https://docs.deepstack.cc/face-recognition/index.html).\n\nRemember to first register faces. See Deepstacks face registration for further details. (https://docs.deepstack.cc/face-recognition/#face-registration)","x":250,"y":100,"wires":[]}]
+[
+    {
+        "id": "efa58330.bbc59",
+        "type": "deepstack-face-recognition",
+        "z": "827a5cb1.8fbcf",
+        "name": "",
+        "server": "c2038f0c.10ee1",
+        "confidence": "80",
+        "drawPredictions": true,
+        "outlineColor": "pink",
+        "filters": [
+            "joakim"
+        ],
+        "outputs": 2,
+        "x": 590,
+        "y": 200,
+        "wires": [
+            [
+                "e7fe002a.cf342"
+            ],
+            [
+                "c1be0415.bdf658"
+            ]
+        ]
+    },
+    {
+        "id": "a14d023a.5f2d8",
+        "type": "inject",
+        "z": "827a5cb1.8fbcf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 200,
+        "wires": [
+            [
+                "53bdebea.5f4164"
+            ]
+        ]
+    },
+    {
+        "id": "e7fe002a.cf342",
+        "type": "debug",
+        "z": "827a5cb1.8fbcf",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "c1be0415.bdf658",
+        "type": "debug",
+        "z": "827a5cb1.8fbcf",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "53bdebea.5f4164",
+        "type": "file in",
+        "z": "827a5cb1.8fbcf",
+        "name": "",
+        "filename": "/Users/me/my_image.jpg",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 350,
+        "y": 200,
+        "wires": [
+            [
+                "efa58330.bbc59"
+            ]
+        ]
+    },
+    {
+        "id": "76ab6c52.8cd014",
+        "type": "comment",
+        "z": "827a5cb1.8fbcf",
+        "name": "Sample object detection",
+        "info": "Sends an image for face recognition to a local deepstack instance.\n\nWorks good with the example image from the Deepstack Face Recognition documentation (https://docs.deepstack.cc/face-recognition/index.html).\n\nRemember to first register faces. See Deepstacks face registration for further details. (https://docs.deepstack.cc/face-recognition/#face-registration)",
+        "x": 250,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "c2038f0c.10ee1",
+        "type": "deepstack-server",
+        "proto": "http",
+        "host": "localhost",
+        "port": "80",
+        "version": "v1",
+        "rejectUnauthorized": false
+    }
+]

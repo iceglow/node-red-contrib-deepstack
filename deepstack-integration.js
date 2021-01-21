@@ -9,17 +9,23 @@ const FormData = require('form-data');
  * @param rejectUnauthorized if not false, the server certificate is verified against the list of supplied CAs
  * @returns {Promise<unknown>}
  */
-function objectDetection(image, url, rejectUnauthorized, confidence) {
+function objectDetection(image, server, confidence) {
     const form = new FormData();
     form.append('image', image, {filename: 'image.jpg'});
     form.append('min_confidence', confidence);
+    if (server.credentials.apiKey) {
+        form.append('api_key', server.credentials.apiKey);
+    }
+    if (server.credentials.adminKey) {
+        form.append('admin_key', server.credentials.adminKey);
+    }
 
     return new Promise((resolve, reject) => {
-        got(url + '/vision/detection', {
+        got(constructURL(server, '/vision/detection'), {
             method: 'POST',
             headers: form.getHeaders(),
             https: {
-                rejectUnauthorized: rejectUnauthorized
+                rejectUnauthorized: server.rejectUnauthorized
             },
             body: form
         }).then(function (response) {
@@ -36,17 +42,23 @@ function objectDetection(image, url, rejectUnauthorized, confidence) {
  * @param rejectUnauthorized if not false, the server certificate is verified against the list of supplied CAs
  * @returns {Promise<unknown>}
  */
-function faceRecognition(image, url, rejectUnauthorized, confidence) {
+function faceRecognition(image, server, confidence) {
     const form = new FormData();
     form.append('image', image, {filename: 'image.jpg'});
     form.append('min_confidence', confidence);
+    if (server.credentials.apiKey) {
+        form.append('api_key', server.credentials.apiKey);
+    }
+    if (server.credentials.adminKey) {
+        form.append('admin_key', server.credentials.adminKey);
+    }
 
     return new Promise((resolve, reject) => {
-        got(url + '/vision/face/recognize', {
+        got(constructURL(server, '/vision/face/recognize'), {
             method: 'POST',
             headers: form.getHeaders(),
             https: {
-                rejectUnauthorized: rejectUnauthorized
+                rejectUnauthorized: server.rejectUnauthorized
             },
             body: form
         }).then( function (response) {
@@ -73,6 +85,10 @@ function getOutlines(prediction) {
         }
     }
 };
+
+function constructURL(server, endpoint) {
+    return server.proto + '://' + server.host + ':' + server.port + '/' + server.version + endpoint;
+}
 
 module.exports = {
     objectDetection,

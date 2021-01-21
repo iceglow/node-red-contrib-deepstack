@@ -17,12 +17,13 @@ module.exports = function(RED) {
     function ObjectDetection(config) {
         RED.nodes.createNode(this, config);
         let node = this;
+        node.server = RED.nodes.getNode(config.server);
 
         node.status({fill:"grey",shape:"dot",text:"idling"});
         node.on('input', function(msg, send, done) {
             node.status({fill:"yellow",shape:"ring",text:"Processing..."});
 
-            objectDetection(msg, config).then(outputs =>{
+            objectDetection(msg, config, node.server).then(outputs =>{
                 node.status({fill: "green", shape: "dot", text: "success"});
                 setTimeout(function () {
                     node.status({fill: "grey", shape: "dot", text: "idling"});
@@ -44,9 +45,10 @@ module.exports = function(RED) {
  *
  * @param msg the incomming msg object.
  * @param config the node configuration.
+ * @param server the server configuration node.
  * @returns {Promise<unknown>}
  */
-function objectDetection(msg, config) {
+function objectDetection(msg, config, server) {
 
     let original = msg.payload;
 
@@ -58,8 +60,7 @@ function objectDetection(msg, config) {
 
         deepstack.objectDetection(
             original,
-            config.url,
-            config.rejectUnauthorized,
+            server,
             config.confidence/100
         ).then(async result => {
             msg.payload = result.predictions;

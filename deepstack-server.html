@@ -1,0 +1,64 @@
+<script type="text/javascript">
+    RED.nodes.registerType('deepstack-server', {
+        category: 'config',
+        defaults: {
+            proto: { value:"http", required:true },
+            host: { value:"localhost", required:true },
+            port: { value:80, required:true, validate:RED.validators.number() },
+            version: { value:"v1", required:true },
+            rejectUnauthorized: { value: true },
+        },
+        credentials: {
+            apiKey: { type:"text", required: false },
+            adminKey: { type:"text", required: false }
+        },
+        label: function() {
+            return this.proto+"://"+this.host+":"+this.port+"/"+this.version;
+        },
+        oneditprepare: function() {
+            var node = this;
+            $(".proto-button-group").on("click", function() {
+                $(".proto-button-group").removeClass("selected");
+                $(this).addClass("selected");
+            })
+        },
+        oneditsave: function() {
+            var node = this;
+            var protocol = $("button.proto-button-group.selected");
+            node.proto = protocol.text();
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="deepstack-server">
+    <label for="proto-buttons">Protocol</label>
+    <span class="button-group" id="proto-buttons">
+        <button type="button" class="red-ui-button toggle selected proto-button-group">http</button><button type="button" class="red-ui-button toggle proto-button-group">https</button>
+        </span>
+    <div class="form-row">
+        <label for="node-config-input-host">Host</label>
+        <input type="text" id="node-config-input-host">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port">Port</label>
+        <input type="text" id="node-config-input-port">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-version">API Version</label>
+        <input type="text" id="node-config-input-version">
+    </div>
+    <hr />
+    <div class="form-row">
+        <label for="node-config-input-apiKey"><i class="fa fa-tag"></i> API Key</label>
+        <input type="text" id="node-config-input-apiKey">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-adminKey"><i class="fa fa-tag"></i> Admin Key</label>
+        <input type="text" id="node-config-input-adminKey">
+    </div>
+    <hr />
+    <div class="form-row">
+        <input type="checkbox" id="node-config-input-rejectUnauthorized" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-config-input-rejectUnauthorized" style="width: 90%;">Reject unauthorized</label>
+    </div>
+</script>
