@@ -28,7 +28,7 @@ function objectDetection(image, server, confidence) {
             },
             body: form
         })
-        .then((response) => JSON.parse(response.body))
+        .then((response) => JSON.parse(response.body));
 };
 
 /**
@@ -58,8 +58,7 @@ function faceRecognition(image, server, confidence) {
             },
             body: form
         })
-        .then((response) => JSON.parse(response.body))
-    });
+        .then((response) => JSON.parse(response.body));
 };
 
 /**
