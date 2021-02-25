@@ -20,18 +20,15 @@ function objectDetection(image, server, confidence) {
         form.append('admin_key', server.credentials.adminKey);
     }
 
-    return new Promise((resolve, reject) => {
-        got(constructURL(server, '/vision/detection'), {
+    return got(constructURL(server, '/vision/detection'), {
             method: 'POST',
             headers: form.getHeaders(),
             https: {
                 rejectUnauthorized: server.rejectUnauthorized
             },
             body: form
-        }).then(function (response) {
-            resolve(JSON.parse(response.body));
-        }).catch(reject);
-    });
+        })
+        .then((response) => JSON.parse(response.body))
 };
 
 /**
@@ -53,17 +50,15 @@ function faceRecognition(image, server, confidence) {
         form.append('admin_key', server.credentials.adminKey);
     }
 
-    return new Promise((resolve, reject) => {
-        got(constructURL(server, '/vision/face/recognize'), {
+    return got(constructURL(server, '/vision/face/recognize'), {
             method: 'POST',
             headers: form.getHeaders(),
             https: {
                 rejectUnauthorized: server.rejectUnauthorized
             },
             body: form
-        }).then( function (response) {
-            resolve(JSON.parse(response.body));
-        }).catch(reject);
+        })
+        .then((response) => JSON.parse(response.body))
     });
 };
 
