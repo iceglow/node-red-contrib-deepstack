@@ -145,7 +145,7 @@ RUN apk update && \
                 --disable-static \
                 --enable-silent-rules && \
     make -s install-strip && \
-    cd /data/ && \
+    cd /usr/src/node-red/ && \
     echo 'Install Node-RED modules' && \
     npm install node-red-contrib-deepstack && \
     \
