@@ -18,7 +18,7 @@
             if (index == 0) {
                 label = 'All Predictions';
             } else {
-                label = 'Filter: ' + this.filters[index-1];
+                label = 'Filter: ' + this.filters[index-1].type;
             }
             return label;
         },
@@ -34,7 +34,7 @@
             function resizeRule(rule) {
                 var newWidth = rule.width();
                 var valueField = rule.find(".node-input-filter-value");
-                valueField.typedInput("width",(newWidth-70));
+                valueField.typedInput("width",(newWidth-70-100));
             }
 
             $("#node-input-filter-container").css('min-height','150px').css('min-width','450px').editableList({
@@ -46,12 +46,45 @@
                     if (!opt.hasOwnProperty('i')) {
                         opt._i = Math.floor((0x99999-0x10000)*Math.random()).toString();
                     }
+                    
+                    if (typeof opt.v !== 'object') {
+                        let newFilterValue = {};
+                        if (opt.v instanceof String) {
+                            newFilterValue['type'] = opt.v;
+                        }
+                        newFilterValue['postProcess'] = false;
+                        newFilterValue['confidence'] = node.confidence;
+                    }
 
+                    if (typeof opt.v.postProcess !== 'boolean') {
+                        opt.v.postProcess = false;
+                    }
+                    if (typeof opt.v.confidence !== 'number') {
+                        opt.v.confidence = node.confidence;
+                    }
+                    
                     var row = $('<div/>').appendTo(container);
+                    var innerUpperRow = $('<div/>').appendTo(container);
+                    var innerLowerRow = $('<div/>',{class: "node-row-filter-postProcessing", style: "margin-top: 5px; margin-left: 10px;"}).appendTo(container).hide();
 
-                    $('<input/>',{class:"node-input-filter-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['str']}).typedInput('value',opt.v);
+                    $('<input/>',{class:"node-input-filter-value",type:"text",style:"margin-left: 5px;"})
+                        .appendTo(innerUpperRow)
+                        .typedInput({default:'str',types:['str']})
+                        .typedInput('value',opt.v.type);
+                    $('<input />',{class:"node-input-filter-postProcessing",type:"checkbox",style:"display: inline-block; width: auto; vertical-align: baseline; margin-left: 10px;"})
+                        .appendTo(innerUpperRow)
+                        .prop('checked', opt.v.postProcess);
+                    $('<label for="node-input-filter-postProcessing" style="width: 90%;margin-left: 5px">Post processing</label>')
+                        .appendTo(innerUpperRow);
+                    $('<label for="node-input-filter-confidence" style="width: auto;"><i class="icon-tag"></i> Minimum Confidence (%)</label>')
+                        .appendTo(innerLowerRow);
+                    $('<input/>',{class:"node-input-filter-confidence",type:"text",style:"margin-left: 5px; margin-top: 2px; width: 60px"})
+                        .appendTo(innerLowerRow)
+                        .typedInput({default:'num',types:['num']})
+                        .typedInput('value', opt.v.confidence);
 
-                    var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
+                    var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"})
+                    .appendTo(row);
                     finalspan.append(' &#8594; <span class="node-input-filter-index">'+(i+2)+'</span> ');
 
                     var currentOutputs = JSON.parse(outputCount.val()||"{}");
@@ -100,14 +133,33 @@
             $("#node-input-drawPredictions").click(function() {
                 $("#row-outlineColor").toggle(this.checked);
             });
+
+            var filters = $("#node-input-filter-container").editableList('items');
+            var node = this;
+            node.filters = [];
+            filters.each(function(i) {
+                if ($(this).find(".node-input-filter-postProcessing").is(":checked")) {
+                    $(this).find(".node-row-filter-postProcessing").show();
+                }
+                let filterSelf = $(this);
+                $(this).find(".node-input-filter-postProcessing").click(function() {
+                    $(filterSelf).find(".node-row-filter-postProcessing").toggle(this.checked);
+                });
+            });
         },
         oneditsave: function() {
             var filters = $("#node-input-filter-container").editableList('items');
             var node = this;
             node.filters = [];
             filters.each(function(i) {
-                var value = $(this).find(".node-input-filter-value").typedInput('value');
-                node.filters.push(value);
+                var type = $(this).find(".node-input-filter-value").typedInput('value');
+                var postProcess = $(this).find(".node-input-filter-postProcessing").is(":checked");
+                var confidence = $(this).find(".node-input-filter-confidence").typedInput('value');
+                node.filters.push({
+                    type: type,
+                    postProcess: postProcess,
+                    confidence: parseInt(confidence)
+                });
             });
             this.propertyType = $("#node-input-property").typedInput('type');
         },

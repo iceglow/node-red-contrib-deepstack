@@ -77,7 +77,11 @@ function objectDetection(msg, config, server) {
 
             for (let i = 0; i < config.filters.length; i++){
                 let filterResult = result.predictions.filter(function (p) {
-                    return p.label == config.filters[i];
+                    let result = p.label == config.filters[i].type;
+                    if (config.filters[i].postProcess) {
+                        result = result && p.confidence >= config.filters[i].confidence/100;
+                    }
+                    return result;
                 });
 
                 let filterOutput = undefined;
