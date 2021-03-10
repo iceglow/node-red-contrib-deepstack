@@ -1,0 +1,101 @@
+[
+    {
+        "id": "6934b40e.b7806c",
+        "type": "inject",
+        "z": "83d43c51.84e46",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 820,
+        "wires": [
+            [
+                "e74216ec.c91698"
+            ]
+        ]
+    },
+    {
+        "id": "e74216ec.c91698",
+        "type": "file in",
+        "z": "83d43c51.84e46",
+        "name": "",
+        "filename": "/Users/me/my_image.jpg",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 330,
+        "y": 820,
+        "wires": [
+            [
+                "b923f9ca.e04148"
+            ]
+        ]
+    },
+    {
+        "id": "a9ed93e.76b957",
+        "type": "comment",
+        "z": "83d43c51.84e46",
+        "name": "Sample face registration",
+        "info": "Sends an image for face registration to a local deepstack instance.\nWorks good with the example image from the Deepstack Face Registration documentation (https://docs.deepstack.cc/face-recognition/index.html#face-registration).",
+        "x": 310,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "2b872653.78a23a",
+        "type": "debug",
+        "z": "83d43c51.84e46",
+        "name": "Result",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "b923f9ca.e04148",
+        "type": "deepstack-face-registration",
+        "z": "83d43c51.84e46",
+        "name": "",
+        "server": "c2038f0c.10ee1",
+        "userid": "me",
+        "outputs": 1,
+        "x": 570,
+        "y": 820,
+        "wires": [
+            [
+                "2b872653.78a23a"
+            ]
+        ]
+    },
+    {
+        "id": "c2038f0c.10ee1",
+        "type": "deepstack-server",
+        "proto": "http",
+        "host": "localhost",
+        "port": "80",
+        "version": "v1",
+        "rejectUnauthorized": false
+    }
+]
