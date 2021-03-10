@@ -5,7 +5,7 @@
         defaults: {
             name: {value:""},
             server: {value:"", type:"deepstack-server"},
-            userid: {value: "", required:true},
+            userid: {value: "", required: false},
             outputs: {value:1}
         },
         inputs:1,
@@ -30,7 +30,7 @@
     <hr />
     <div class="form-row">
         <label for="node-input-userid"><i class="icon-tag"></i> Userid</label>
-        <input type="text" id="node-input-userid" size="5">
+        <input type="text" id="node-input-userid" size="5" placeholder="if empty, set msg.userid">
     </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-rejectUnauthorized" style="display: inline-block; width: auto; vertical-align: top;">
@@ -49,6 +49,10 @@
             <span class="property-type">buffer</span>
         </dt>
         <dd> the image buffer to send to Deepstack. </dd>
+        <dt class="optional">userid
+            <span class="property-type">string</span>
+        </dt>
+        <dd> user id to register the face for. Optional and if present will override 'userid' from node configuration.</dd>
     </dl>
 
     <h3>Outputs</h3>
@@ -59,6 +63,14 @@
             <dl class="message-properties">
                 <dt>payload <span class="property-type">string</span></dt>
                 <dd>Deepstack Face Registration result.</dd>
+                <dt>success <span class="property-type">boolean</span></dt>
+                <dd>Deepstack Face Registration status.</dd>
+            </dl>
+        </li>
+        <li>Standard error
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">string</span></dt>
+                <dd>Deepstack Face Registration error.</dd>
                 <dt>success <span class="property-type">boolean</span></dt>
                 <dd>Deepstack Face Registration status.</dd>
             </dl>

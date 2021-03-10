@@ -65,12 +65,14 @@ function faceRegistration(msg, config, server) {
         images = [images];
     }
 
+    let userid = msg.userid || config.userid;
+
     return new Promise((resolve, reject) => {
         
         deepstack.faceRegistration(
             images,
             server,
-            config.userid
+            userid
         ).then(async result => {
             msg.payload = result.message || result.error;
             msg.success = result.success;
