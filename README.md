@@ -21,6 +21,21 @@ The first output always contain all predictions made by the Face Recognition API
 **msg.outlinedImage**: Image buffer with rectangular outline around the faces. Only if config option
 *drawPredictions* is true.
 
+## Node Face Registration
+Sends an image to the Deepstack Face Registration API and outputs the result.
+
+### Inputs
+The input message should contain the image to send for registration.
+
+**msg.payload**: Image buffer to process.
+
+### Outputs
+The registration result.
+
+**msg.payload**: Deepstack Face Registration result.
+
+**msg.success**: Deepstack call status.
+
 ## Node Object Detection
 Sends an image to the Deepstack Object Detection API and outputs the predictions.
 

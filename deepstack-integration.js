@@ -5,8 +5,8 @@ const FormData = require('form-data');
  * Call the Deepstack API and return Promise with response body as JSON.
  *
  * @param image the image buffer to send to the Deepstack API.
- * @param url the base URL of the Deepstack service.
- * @param rejectUnauthorized if not false, the server certificate is verified against the list of supplied CAs
+ * @param server Deepstack server configuration.
+ * @param confidence the minimum confidence in decimal form, 0-1. Ex: 0.8
  * @returns {Promise<unknown>}
  */
 function objectDetection(image, server, confidence) {
@@ -35,8 +35,8 @@ function objectDetection(image, server, confidence) {
  * Call the Deepstack API and return Promise with response body as JSON.
  *
  * @param image the image buffer to send to the Deepstack API.
- * @param url the base URL of the Deepstack service.
- * @param rejectUnauthorized if not false, the server certificate is verified against the list of supplied CAs
+ * @param server Deepstack server configuration.
+ * @param confidence the minimum confidence in decimal form, 0-1. Ex: 0.8
  * @returns {Promise<unknown>}
  */
 function faceRecognition(image, server, confidence) {
@@ -60,6 +60,39 @@ function faceRecognition(image, server, confidence) {
         })
         .then((response) => JSON.parse(response.body));
 };
+
+/**
+ * Call the Deepstack API and return Promise with response body as JSON.
+ *
+ * @param images array of image buffers to send to the Deepstack API.
+ * @param server Deepstack server configuration.
+ * @param userid user id to registrate faces for.
+ * @returns {Promise<unknown>}
+ */
+function faceRegistration(images, server, userid) {
+    const form = new FormData();
+    for (let i = 0; i < images.length; i++) {
+        form.append(`image${i}`, images[i], {filename: `image${i}.jpg`});
+    }
+    form.append('userid', userid);
+    if (server.credentials.apiKey) {
+        form.append('api_key', server.credentials.apiKey);
+    }
+    if (server.credentials.adminKey) {
+        form.append('admin_key', server.credentials.adminKey);
+    }
+
+    return got(constructURL(server, '/vision/face/register'), {
+            method: 'POST',
+            headers: form.getHeaders(),
+            https: {
+                rejectUnauthorized: server.rejectUnauthorized
+            },
+            body: form
+        })
+        .then((response) => JSON.parse(response.body));
+};
+
 
 /**
  * Calculate where to place the outlines.
@@ -87,5 +120,6 @@ function constructURL(server, endpoint) {
 module.exports = {
     objectDetection,
     faceRecognition,
+    faceRegistration,
     getOutlines
 };

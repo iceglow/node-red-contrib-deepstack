@@ -24,7 +24,8 @@
     "nodes": {
       "deepstack-server": "deepstack-server.js",
       "deepstack-object-detection": "deepstack-object-detection.js",
-      "deepstack-face-recognition": "deepstack-face-recognition.js"
+      "deepstack-face-recognition": "deepstack-face-recognition.js",
+      "deepstack-face-registration": "deepstack-face-registration.js"
     }
   },
   "dependencies": {

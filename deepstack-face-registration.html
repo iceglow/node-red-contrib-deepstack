@@ -1,0 +1,75 @@
+<script type="text/javascript">
+    RED.nodes.registerType('deepstack-face-registration',{
+        category: 'function',
+        color: '#4682b4',
+        defaults: {
+            name: {value:""},
+            server: {value:"", type:"deepstack-server"},
+            userid: {value: "", required:true},
+            outputs: {value:1}
+        },
+        inputs:1,
+        outputs:1,
+        outputLabels: 'Registration result',
+        icon: "font-awesome/fa-user",
+        label: function() {
+            return this.name||"Face Registration";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="deepstack-face-registration">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="icon-tag"></i> Deepstack server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <hr />
+    <div class="form-row">
+        <label for="node-input-userid"><i class="icon-tag"></i> Userid</label>
+        <input type="text" id="node-input-userid" size="5">
+    </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-rejectUnauthorized" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-rejectUnauthorized" style="width: 90%;">Reject unauthorized</label>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="deepstack-face-registration">
+    <p>A node to register faces using the Deepstack Face Registration API.</p>
+
+    <h3>Inputs</h3>
+    <p>The node takes one single input, the image to be sent.</p>
+
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">buffer</span>
+        </dt>
+        <dd> the image buffer to send to Deepstack. </dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <p>The result of the facee registration.</p>
+
+    <ol class="node-ports">
+        <li>Standard output
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">string</span></dt>
+                <dd>Deepstack Face Registration result.</dd>
+                <dt>success <span class="property-type">boolean</span></dt>
+                <dd>Deepstack Face Registration status.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Details</h3>
+    <p>Sends an image to the Deepstack Face Registration API and outputs the result.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://deepstack.cc/">Deepstack</a> - the service performing the actual magic.</li>
+    </ul>
+</script>
