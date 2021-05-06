@@ -16,6 +16,8 @@ The first output always contain all predictions made by the Face Recognition API
 
 **msg.success**: Deepstack call status.
 
+**msg.duration**: Deepstack call duration.
+
 **msg.originalImage**: The image buffer processed.
 
 **msg.outlinedImage**: Image buffer with rectangular outline around the faces. Only if config option
@@ -36,6 +38,8 @@ The registration result.
 
 **msg.success**: Deepstack call status.
 
+**msg.duration**: Deepstack call duration.
+
 ## Node Object Detection
 Sends an image to the Deepstack Object Detection API and outputs the predictions.
 
@@ -50,6 +54,8 @@ The first output always contain all predictions made by the Object Detection API
 **msg.payload**: Deepstack Object Detection predictions.
 
 **msg.success**: Deepstack call status.
+
+**msg.duration**: Deepstack call duration.
 
 **msg.originalImage**: The image buffer processed.
 
