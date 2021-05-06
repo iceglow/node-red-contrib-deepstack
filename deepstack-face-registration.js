@@ -76,6 +76,7 @@ function faceRegistration(msg, config, server) {
         ).then(async result => {
             msg.payload = result.message || result.error;
             msg.success = result.success;
+            msg.duration = result.duration || 0;
 
             resolve(msg);
         }).catch(reject);

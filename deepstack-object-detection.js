@@ -50,13 +50,17 @@ module.exports = function(RED) {
  */
 function objectDetection(msg, config, server) {
 
-    let original = msg.payload;
-
-    if (original.type === 'Buffer') {
-        original = Buffer.from(original.data)
-    }
-
     return new Promise((resolve, reject) => {
+
+        let original = msg.payload;
+
+        if (!original) {
+            reject("No image provided. Please set msg.payload.")
+        }
+    
+        if (original.type === 'Buffer') {
+            original = Buffer.from(original.data)
+        }
 
         deepstack.objectDetection(
             original,
@@ -65,6 +69,7 @@ function objectDetection(msg, config, server) {
         ).then(async result => {
             msg.payload = result.predictions;
             msg.success = result.success;
+            msg.duration = result.duration || 0;
             msg.originalImage = original;
             if (config.drawPredictions) {
                 msg.outlinedImage = await im.outlineImage(

@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-deepstack",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simple Node-RED nodes for interacting with the Deepstack API.",
   "author": "Joakim Lundin <joakim.lundin@gmail.com>",
   "license": "BSD-3-Clause",
@@ -37,6 +37,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
-    "nock": "^13.0.5"
+    "nock": "^13.0.5",
+    "rewire": "^5.0.0"
   }
 }
