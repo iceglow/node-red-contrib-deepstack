@@ -43,5 +43,21 @@ describe('Deepstack face recognition', function() {
             var outputs = await faceRecognition({payload: {}},{filters: []},{});
             expect(outputs[0].duration).to.equal(0);
         });
+        
+        it('should handle floats', async function() {
+            const duration = 0.123;
+            let deepstackMock = {
+                faceRecognition: function (original, server, confidence) {
+                    return new Promise((resolve, reject) => {
+                        resolve({duration: duration});
+                    });
+                }
+            };
+
+            deepstackFaceRecognition.__set__("deepstack", deepstackMock);
+
+            var outputs = await faceRecognition({payload: {}},{filters: []},{});
+            expect(outputs[0].duration).to.equal(duration);
+        });
     });
 });

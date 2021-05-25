@@ -43,5 +43,21 @@ describe('Deepstack oject detection', function() {
             var outputs = await objectDetection({payload: {}},{filters: []},{});
             expect(outputs[0].duration).to.equal(0);
         });
+        
+        it('should handle floats', async function() {
+            const duration = 0.123;
+            let deepstackMock = {
+                objectDetection: function (original, server, confidence) {
+                    return new Promise((resolve, reject) => {
+                        resolve({duration: duration});
+                    });
+                }
+            };
+
+            deepstackOjectDetection.__set__("deepstack", deepstackMock);
+
+            var outputs = await objectDetection({payload: {}},{filters: []},{});
+            expect(outputs[0].duration).to.equal(duration);
+        });
     });
 });
