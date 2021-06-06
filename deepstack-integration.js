@@ -9,7 +9,7 @@ const FormData = require('form-data');
  * @param confidence the minimum confidence in decimal form, 0-1. Ex: 0.8
  * @returns {Promise<unknown>}
  */
-function objectDetection(image, server, confidence) {
+function objectDetection(image, server, confidence, custom) {
     const form = new FormData();
     form.append('image', image, {filename: 'image.jpg'});
     form.append('min_confidence', confidence);
@@ -19,8 +19,13 @@ function objectDetection(image, server, confidence) {
     if (server.credentials.adminKey) {
         form.append('admin_key', server.credentials.adminKey);
     }
-
-    return got(constructURL(server, '/vision/detection'), {
+    if (custom != "")
+    {
+        detectPath = custom;
+    } else {
+        detectPath = '/vision/detection';
+    }
+    return got(constructURL(server, detectPath), {
             method: 'POST',
             headers: form.getHeaders(),
             https: {

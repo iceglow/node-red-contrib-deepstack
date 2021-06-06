@@ -48,7 +48,7 @@ module.exports = function(RED) {
  * @param server the server configuration node.
  * @returns {Promise<unknown>}
  */
-function objectDetection(msg, config, server) {
+function objectDetection(msg, config, server, custom) {
 
     return new Promise((resolve, reject) => {
 
@@ -65,7 +65,8 @@ function objectDetection(msg, config, server) {
         deepstack.objectDetection(
             original,
             server,
-            config.confidence/100
+            config.confidence/100,
+            custom,
         ).then(async result => {
             msg.payload = result.predictions;
             msg.success = result.success;
