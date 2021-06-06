@@ -6,6 +6,7 @@
             host: { value:"localhost", required:true },
             port: { value:80, required:true, validate:RED.validators.number() },
             version: { value:"v1", required:true },
+            custom: {value:"", required:false },
             rejectUnauthorized: { value: true },
         },
         credentials: {
@@ -46,6 +47,10 @@
     <div class="form-row">
         <label for="node-config-input-version">API Version</label>
         <input type="text" id="node-config-input-version">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-custom">Custom URL</label>
+        <input type="text" id="node-config-input-custom">  
     </div>
     <hr />
     <div class="form-row">
