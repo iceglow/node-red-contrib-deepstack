@@ -9,7 +9,7 @@ const FormData = require('form-data');
  * @param confidence the minimum confidence in decimal form, 0-1. Ex: 0.8
  * @returns {Promise<unknown>}
  */
-function objectDetection(image, server, confidence, custom) {
+function objectDetection(image, server, confidence) {
     const form = new FormData();
     form.append('image', image, {filename: 'image.jpg'});
     form.append('min_confidence', confidence);
@@ -19,13 +19,36 @@ function objectDetection(image, server, confidence, custom) {
     if (server.credentials.adminKey) {
         form.append('admin_key', server.credentials.adminKey);
     }
-    if (custom != "")
-    {
-        detectPath = custom;
-    } else {
-        detectPath = '/vision/detection';
+    return got(constructURL(server, '/vision/detection'), {
+            method: 'POST',
+            headers: form.getHeaders(),
+            https: {
+                rejectUnauthorized: server.rejectUnauthorized
+            },
+            body: form
+        })
+        .then((response) => JSON.parse(response.body));
+};
+
+/**
+ * Call the Deepstack API and return Promise with response body as JSON.
+ *
+ * @param image the image buffer to send to the Deepstack API.
+ * @param server Deepstack server configuration.
+ * @param confidence the minimum confidence in decimal form, 0-1. Ex: 0.8
+ * @returns {Promise<unknown>}
+ */
+function customModel(image, server, confidence, customModel) {
+    const form = new FormData();
+    form.append('image', image, {filename: 'image.jpg'});
+    form.append('min_confidence', confidence);
+    if (server.credentials.apiKey) {
+        form.append('api_key', server.credentials.apiKey);
     }
-    return got(constructURL(server, detectPath), {
+    if (server.credentials.adminKey) {
+        form.append('admin_key', server.credentials.adminKey);
+    }
+    return got(constructURL(server, '/vision/custom/' + customModel), {
             method: 'POST',
             headers: form.getHeaders(),
             https: {
@@ -124,6 +147,7 @@ function constructURL(server, endpoint) {
 
 module.exports = {
     objectDetection,
+    customModel,
     faceRecognition,
     faceRegistration,
     getOutlines

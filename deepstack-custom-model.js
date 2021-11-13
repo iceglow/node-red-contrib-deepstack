@@ -14,7 +14,7 @@ const im = require('./image-manipulation');
  */
 
 module.exports = function(RED) {
-    function ObjectDetection(config) {
+    function CustomModel(config) {
         RED.nodes.createNode(this, config);
         let node = this;
         node.server = RED.nodes.getNode(config.server);
@@ -23,7 +23,7 @@ module.exports = function(RED) {
         node.on('input', function(msg, send, done) {
             node.status({fill:"yellow",shape:"ring",text:"Processing..."});
 
-            objectDetection(msg, config, node.server).then(outputs =>{
+            customModel(msg, config, node.server).then(outputs =>{
                 node.status({fill: "green", shape: "dot", text: "success"});
                 setTimeout(function () {
                     node.status({fill: "grey", shape: "dot", text: "idling"});
@@ -37,7 +37,7 @@ module.exports = function(RED) {
             });
         });
     }
-    RED.nodes.registerType("deepstack-object-detection", ObjectDetection, {});
+    RED.nodes.registerType("deepstack-custom-model", CustomModel, {});
 };
 
 /**
@@ -48,7 +48,7 @@ module.exports = function(RED) {
  * @param server the server configuration node.
  * @returns {Promise<unknown>}
  */
-function objectDetection(msg, config, server) {
+function customModel(msg, config, server) {
 
     return new Promise((resolve, reject) => {
 
@@ -62,10 +62,11 @@ function objectDetection(msg, config, server) {
             original = Buffer.from(original.data)
         }
 
-        deepstack.objectDetection(
+        deepstack.customModel(
             original,
             server,
             config.confidence/100,
+            config.customModel,
         ).then(async result => {
             msg.payload = result.predictions;
             msg.success = result.success;
