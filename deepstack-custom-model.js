@@ -4,7 +4,7 @@ const deepstack = require('./deepstack-integration');
 const im = require('./image-manipulation');
 
 /*
- * Object Detection node
+ * Custom Model node
  *
  * Status:
  *   - grey   dot  "Idling, waiting for images to process"
@@ -14,7 +14,7 @@ const im = require('./image-manipulation');
  */
 
 module.exports = function(RED) {
-    function ObjectDetection(config) {
+    function CustomModel(config) {
         RED.nodes.createNode(this, config);
         let node = this;
         node.server = RED.nodes.getNode(config.server);
@@ -23,13 +23,13 @@ module.exports = function(RED) {
         node.on('input', function(msg, send, done) {
             node.status({fill:"yellow",shape:"ring",text:"Processing..."});
 
-            objectDetection(msg, config, node.server).then(outputs =>{
+            customModel(msg, config, node.server).then(output =>{
                 node.status({fill: "green", shape: "dot", text: "success"});
                 setTimeout(function () {
                     node.status({fill: "grey", shape: "dot", text: "idling"});
                 }, 2000);
 
-                node.send(outputs);
+                node.send(output);
             }).catch(reason => {
                 node.status({fill:"red",shape:"ring",text:"error detecting objects"});
                 node.error(reason);
@@ -37,7 +37,7 @@ module.exports = function(RED) {
             });
         });
     }
-    RED.nodes.registerType("deepstack-object-detection", ObjectDetection, {});
+    RED.nodes.registerType("deepstack-custom-model", CustomModel, {});
 };
 
 /**
@@ -48,7 +48,7 @@ module.exports = function(RED) {
  * @param server the server configuration node.
  * @returns {Promise<unknown>}
  */
-function objectDetection(msg, config, server) {
+function customModel(msg, config, server) {
 
     return new Promise((resolve, reject) => {
 
@@ -62,10 +62,11 @@ function objectDetection(msg, config, server) {
             original = Buffer.from(original.data)
         }
 
-        deepstack.objectDetection(
+        deepstack.customModel(
             original,
             server,
             config.confidence/100,
+            config.customModel,
         ).then(async result => {
             msg.payload = result.predictions;
             msg.success = result.success;
@@ -78,28 +79,7 @@ function objectDetection(msg, config, server) {
                     config.outlineColor);
             }
 
-            let outputs = [msg];
-
-            for (let i = 0; i < config.filters.length; i++){
-                let filterResult = result.predictions.filter(function (p) {
-                    return p.label == config.filters[i];
-                });
-
-                let filterOutput = undefined;
-                if (filterResult.length > 0) {
-                    filterOutput = clonedeep(msg);
-                    filterOutput.payload = filterResult;
-                    if (config.drawPredictions) {
-                        filterOutput.outlinedImage = await im.outlineImage(
-                            original,
-                            deepstack.getOutlines(filterResult),
-                            config.outlineColor);
-                    }
-                }
-                outputs.push(filterOutput);
-            }
-
-            resolve(outputs);
+            resolve(msg);
         }).catch(reject);
     });
 }
