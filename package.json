@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-deepstack",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Simple Node-RED nodes for interacting with the Deepstack API.",
   "author": "Joakim Lundin <joakim.lundin@gmail.com>",
   "license": "BSD-3-Clause",
@@ -30,10 +30,10 @@
     }
   },
   "dependencies": {
-    "form-data": "^3.0.0",
-    "got": "^11.8.0",
+    "form-data": "^4.0.0",
+    "got": "^11.8.3",
     "lodash.clonedeep": "^4.5.0",
-    "sharp": "^0.28.1"
+    "sharp": "^0.29.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",
