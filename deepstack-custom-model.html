@@ -10,119 +10,13 @@
             drawPredictions: {value: false},
             outlineColor: {value: 'pink'},
             custom: {value: ""},
-            filters: {value:[]},
             outputs: {value:1}
         },
         inputs:1,
         outputs:1,
-        outputLabels: function(index) {
-            let label = "";
-            if (index == 0) {
-                label = 'All Predictions';
-            } else {
-                label = 'Filter: ' + this.filters[index-1];
-            }
-            return label;
-        },
         icon: "font-awesome/fa-code",
         label: function() {
             return this.name||"Custom Model";
-        },
-        oneditprepare: function() {
-            var node = this;
-
-            var outputCount = $("#node-input-outputs").val("{\"0\":0}");
-
-            function resizeRule(rule) {
-                var newWidth = rule.width();
-                var valueField = rule.find(".node-input-filter-value");
-                valueField.typedInput("width",(newWidth-70));
-            }
-
-            $("#node-input-filter-container").css('min-height','150px').css('min-width','450px').editableList({
-                addItem: function(container,i,opt) {
-                    container.css({
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap'
-                    });
-                    if (!opt.hasOwnProperty('i')) {
-                        opt._i = Math.floor((0x99999-0x10000)*Math.random()).toString();
-                    }
-
-                    var row = $('<div/>').appendTo(container);
-
-                    $('<input/>',{class:"node-input-filter-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['str']}).typedInput('value',opt.v);
-
-                    var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
-                    finalspan.append(' &#8594; <span class="node-input-filter-index">'+(i+2)+'</span> ');
-
-                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
-                    currentOutputs[opt.hasOwnProperty('i')?opt.i:opt._i] = i+1;
-                    outputCount.val(JSON.stringify(currentOutputs));
-                },
-                removeItem: function(opt) {
-                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
-                    if (opt.hasOwnProperty('i')) {
-                        currentOutputs[opt.i] = -1;
-                    } else {
-                        delete currentOutputs[opt._i];
-                    }
-                    var rules = $("#node-input-filter-container").editableList('items');
-                    rules.each(function(i) {
-                        $(this).find(".node-input-filter-index").html(i+1);
-                        var data = $(this).data('data');
-                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i+1;
-                    });
-                    outputCount.val(JSON.stringify(currentOutputs));
-                },
-                resizeItem: resizeRule,
-                sortItems: function(opt) {
-                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
-                    var filters = $("#node-input-filter-container").editableList('items');
-                    filters.each(function(i) {
-                        $(this).find(".node-input-filter-index").html(i+1);
-                        var data = $(this).data('data');
-                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i+1;
-                    });
-                    outputCount.val(JSON.stringify(currentOutputs));
-                },
-                sortable: true,
-                removable: true
-            });
-
-            for (var i=0;i<this.filters.length;i++) {
-                var filter = this.filters[i];
-                $("#node-input-filter-container").editableList('addItem',{v: filter, i: i+1});
-            }
-
-            if (! $("#node-input-drawPredictions").is(":checked")) {
-                $("#row-outlineColor").hide();
-            }
-
-            $("#node-input-drawPredictions").click(function() {
-                $("#row-outlineColor").toggle(this.checked);
-            });
-        },
-        oneditsave: function() {
-            var filters = $("#node-input-filter-container").editableList('items');
-            var node = this;
-            node.filters = [];
-            filters.each(function(i) {
-                var value = $(this).find(".node-input-filter-value").typedInput('value');
-                node.filters.push(value);
-            });
-            this.propertyType = $("#node-input-property").typedInput('type');
-        },
-        oneditresize: function(size) {
-            var rows = $("#dialog-form>div:not(.node-input-filter-container-row)");
-            var height = size.height;
-            for (var i=0;i<rows.length;i++) {
-                height -= $(rows[i]).outerHeight(true);
-            }
-            var editorRow = $("#dialog-form>div.node-input-filter-container-row");
-            height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
-            height += 16;
-            $("#node-input-filter-container").editableList('height',height);
         }
     });
 </script>
@@ -153,18 +47,11 @@
         <label for="node-input-outlineColor"><i class="icon-tag"></i> Outline color</label>
         <input type="text" id="node-input-outlineColor">
     </div>
-    <div class="form-row">
-        <hr />
-        <p>Filter output</p>
-        <input type="hidden" id="node-input-outputs"/>
-    </div>
-    <div class="form-row node-input-filter-container-row">
-        <ol id="node-input-filter-container"></ol>
-    </div>
 </script>
 
 <script type="text/x-red" data-help-name="deepstack-custom-model">
-    <p>A node to query the Deepstack Object Detection API.</p>
+    <p>A node to query the Deepstack Custom Model API.</p>
+    <p>Before usage of this node, make sure the model is installed on your Deepstack server. See Deepstack <a href="https://docs.deepstack.cc/custom-models/index.html">docs on custom models</a> for deteails.</p>
 
     <h3>Inputs</h3>
     <p>The node takes one single input, the image to be processed.</p>
@@ -177,28 +64,15 @@
     </dl>
 
     <h3>Outputs</h3>
-    <p>One or several outputs can be configured for this node. The default first output is always all predictions.
-    If desired, additional outputs can be configured, filtering the predictions.</p>
+    <p>The output contains all predictions made by the Custom Model API.</p>
 
     <ol class="node-ports">
         <li>Standard output
             <dl class="message-properties">
                 <dt>payload <span class="property-type">object</span></dt>
-                <dd>Deepstack Object Detection predictions.</dd>
+                <dd>Deepstack Detection predictions.</dd>
                 <dt>success <span class="property-type">boolean</span></dt>
-                <dd>Deepstack Object Detection status.</dd>
-                <dt>originalImage <span class="property-type">buffer</span></dt>
-                <dd>the image buffer processed.</dd>
-                <dt>outlinedImage <span class="property-type">buffer</span></dt>
-                <dd>the image buffer with rectangular outline around detected objects. Only if config option *drawPredictions* is true.</dd>
-            </dl>
-        </li>
-        <li>Filtered output
-            <dl class="message-properties">
-                <dt>payload <span class="property-type">object</span></dt>
-                <dd>Deepstack Object Detection predictions.</dd>
-                <dt>success <span class="property-type">boolean</span></dt>
-                <dd>Deepstack Object Detection status.</dd>
+                <dd>Deepstack Detection status.</dd>
                 <dt>originalImage <span class="property-type">buffer</span></dt>
                 <dd>the image buffer processed.</dd>
                 <dt>outlinedImage <span class="property-type">buffer</span></dt>
@@ -208,7 +82,7 @@
     </ol>
 
     <h3>Details</h3>
-    <p>Sends an image to the Deepstack Object Detection API and outputs the predictions.</p>
+    <p>Sends an image to the Deepstack Custom Model API and outputs the predictions.</p>
 
     <h3>References</h3>
     <ul>

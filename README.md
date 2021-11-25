@@ -62,6 +62,28 @@ The first output always contain all predictions made by the Object Detection API
 **msg.outlinedImage**: Image buffer with rectangular outline around detected objects. Only if config option
 *drawPredictions* is true.
 
+## Node Custom Model
+Sends an image to the Deepstack Custom Model API and outputs the predictions.
+
+### Inputs
+The input message should contain the image to process.
+
+**msg.payload**: Image buffer to process.
+
+### Outputs
+The output contains all predictions made by the Custom Model API.
+
+**msg.payload**: Deepstack Custom Model predictions.
+
+**msg.success**: Deepstack call status.
+
+**msg.duration**: Deepstack call duration.
+
+**msg.originalImage**: The image buffer processed.
+
+**msg.outlinedImage**: Image buffer with rectangular outline around detected objects. Only if config option
+*drawPredictions* is true.
+
 ## Troubleshooting
 Common errors and fixes
 
