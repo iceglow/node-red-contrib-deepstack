@@ -24,8 +24,8 @@ describe('Deepstack custom model', function() {
 
             deepstackCustomModel.__set__("deepstack", deepstackMock);
 
-            var outputs = await customModel({payload: {}},{filters: []},{});
-            expect(outputs[0].duration).to.equal(duration);
+            var output = await customModel({payload: {}},{});
+            expect(output.duration).to.equal(duration);
         });
         
         it('should set duration to 0 for missing duration', async function() {
@@ -40,8 +40,8 @@ describe('Deepstack custom model', function() {
 
             deepstackCustomModel.__set__("deepstack", deepstackMock);
 
-            var outputs = await customModel({payload: {}},{filters: []},{});
-            expect(outputs[0].duration).to.equal(0);
+            var output = await customModel({payload: {}},{});
+            expect(output.duration).to.equal(0);
         });
         
         it('should handle floats', async function() {
@@ -56,8 +56,8 @@ describe('Deepstack custom model', function() {
 
             deepstackCustomModel.__set__("deepstack", deepstackMock);
 
-            var outputs = await customModel({payload: {}},{filters: []},{});
-            expect(outputs[0].duration).to.equal(duration);
+            var output = await customModel({payload: {}},{});
+            expect(output.duration).to.equal(duration);
         });
     });
 });
