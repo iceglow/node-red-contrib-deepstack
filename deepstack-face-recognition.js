@@ -1,7 +1,7 @@
 const clonedeep = require('lodash.clonedeep')
 
 const deepstack = require('./deepstack-integration');
-const im = require('./image-manipulation');
+const pu = require('./prediction-utils');
 
 /*
  * Object Detection node
@@ -72,10 +72,8 @@ function faceRecognition(msg, config, server) {
             msg.duration = result.duration || 0;
             msg.originalImage = original;
             if (config.drawPredictions) {
-                msg.outlinedImage = await im.outlineImage(
-                    original,
-                    deepstack.getOutlines(result.predictions),
-                    config.outlineColor);
+                let predictions = result.predictions.map(p => {p.label = p.userid});
+                msg.outlinedImage = await pu.drawPredictions(original, predictions, config.outlineColor, config.printLabel);
             }
 
             let outputs = [msg];
@@ -90,10 +88,8 @@ function faceRecognition(msg, config, server) {
                     filterOutput = clonedeep(msg);
                     filterOutput.payload = filterResult;
                     if (config.drawPredictions) {
-                        filterOutput.outlinedImage = await im.outlineImage(
-                            original,
-                            deepstack.getOutlines(filterResult),
-                            config.outlineColor);
+                        let predictions = filterResult.map(p => {p.label = p.userid});
+                        filterOutput.outlinedImage = await pu.drawPredictions(original, predictions, config.outlineColor, config.printLabel);
                     }
                 }
                 outputs.push(filterOutput);

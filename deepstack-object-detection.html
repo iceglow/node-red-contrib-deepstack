@@ -7,6 +7,7 @@
             server: {value:"", type:"deepstack-server"},
             confidence: {value: 80,required:true,validate:RED.validators.number()},
             drawPredictions: {value: false},
+            printLabel: {value: false},
             outlineColor: {value: 'pink'},
             custom: {value: ""},
             filters: {value:[]},
@@ -96,10 +97,12 @@
 
             if (! $("#node-input-drawPredictions").is(":checked")) {
                 $("#row-outlineColor").hide();
+                $("#row-printLabel").hide();
             }
 
             $("#node-input-drawPredictions").click(function() {
                 $("#row-outlineColor").toggle(this.checked);
+                $("#row-printLabel").toggle(this.checked);
             });
         },
         oneditsave: function() {
@@ -147,6 +150,10 @@
     <div class="form-row" id="row-outlineColor" style="padding-left:10%;">
         <label for="node-input-outlineColor"><i class="icon-tag"></i> Outline color</label>
         <input type="text" id="node-input-outlineColor">
+    </div>
+    <div class="form-row" id="row-printLabel" style="padding-left:10%;">
+        <input type="checkbox" id="node-input-printLabel" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-printLabel" style="width: 90%;">Print prediction label</label>
     </div>
     <div class="form-row">
         <hr />

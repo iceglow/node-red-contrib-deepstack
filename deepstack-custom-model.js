@@ -1,7 +1,7 @@
 const clonedeep = require('lodash.clonedeep')
 
 const deepstack = require('./deepstack-integration');
-const im = require('./image-manipulation');
+const pu = require('./prediction-utils');
 
 /*
  * Custom Model node
@@ -73,10 +73,7 @@ function customModel(msg, config, server) {
             msg.duration = result.duration || 0;
             msg.originalImage = original;
             if (config.drawPredictions) {
-                msg.outlinedImage = await im.outlineImage(
-                    original,
-                    deepstack.getOutlines(result.predictions),
-                    config.outlineColor);
+                msg.outlinedImage = await pu.drawPredictions(original, result.predictions, config.outlineColor, config.printLabel);
             }
 
             resolve(msg);
