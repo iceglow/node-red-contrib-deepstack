@@ -23,6 +23,7 @@
   "node-red": {
     "nodes": {
       "deepstack-server": "deepstack-server.js",
+      "deepstack-image-alpr": "deepstack-image-alpr.js",
       "deepstack-custom-model": "deepstack-custom-model.js",
       "deepstack-object-detection": "deepstack-object-detection.js",
       "deepstack-face-recognition": "deepstack-face-recognition.js",
