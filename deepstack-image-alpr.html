@@ -1,0 +1,219 @@
+<script type="text/javascript">
+    RED.nodes.registerType('deepstack-image-alpr',{
+        category: 'function',
+        color: '#4682b4',
+        defaults: {
+            name: {value:""},
+            server: {value:"", type:"deepstack-server"},
+            confidence: {value: 80,required:true,validate:RED.validators.number()},
+            drawPredictions: {value: false},
+            printLabel: {value: false},
+            outlineColor: {value: 'pink'},
+            custom: {value: ""},
+            filters: {value:[]},
+            outputs: {value:1}
+        },
+        inputs:1,
+        outputs:1,
+        outputLabels: function(index) {
+            let label = "";
+            if (index == 0) {
+                label = 'All Predictions';
+            } else {
+                label = 'Filter: ' + this.filters[index-1];
+            }
+            return label;
+        },
+        icon: "font-awesome/fa-file-image-o",
+        label: function() {
+            return this.name||"Image ALPR";
+        },
+        oneditprepare: function() {
+            var node = this;
+
+            var outputCount = $("#node-input-outputs").val("{\"0\":0}");
+
+            function resizeRule(rule) {
+                var newWidth = rule.width();
+                var valueField = rule.find(".node-input-filter-value");
+                valueField.typedInput("width",(newWidth-70));
+            }
+
+            $("#node-input-filter-container").css('min-height','150px').css('min-width','450px').editableList({
+                addItem: function(container,i,opt) {
+                    container.css({
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
+                    });
+                    if (!opt.hasOwnProperty('i')) {
+                        opt._i = Math.floor((0x99999-0x10000)*Math.random()).toString();
+                    }
+
+                    var row = $('<div/>').appendTo(container);
+
+                    $('<input/>',{class:"node-input-filter-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'str',types:['str']}).typedInput('value',opt.v);
+
+                    var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
+                    finalspan.append(' &#8594; <span class="node-input-filter-index">'+(i+2)+'</span> ');
+
+                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
+                    currentOutputs[opt.hasOwnProperty('i')?opt.i:opt._i] = i+1;
+                    outputCount.val(JSON.stringify(currentOutputs));
+                },
+                removeItem: function(opt) {
+                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
+                    if (opt.hasOwnProperty('i')) {
+                        currentOutputs[opt.i] = -1;
+                    } else {
+                        delete currentOutputs[opt._i];
+                    }
+                    var rules = $("#node-input-filter-container").editableList('items');
+                    rules.each(function(i) {
+                        $(this).find(".node-input-filter-index").html(i+1);
+                        var data = $(this).data('data');
+                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i+1;
+                    });
+                    outputCount.val(JSON.stringify(currentOutputs));
+                },
+                resizeItem: resizeRule,
+                sortItems: function(opt) {
+                    var currentOutputs = JSON.parse(outputCount.val()||"{}");
+                    var filters = $("#node-input-filter-container").editableList('items');
+                    filters.each(function(i) {
+                        $(this).find(".node-input-filter-index").html(i+1);
+                        var data = $(this).data('data');
+                        currentOutputs[data.hasOwnProperty('i')?data.i:data._i] = i+1;
+                    });
+                    outputCount.val(JSON.stringify(currentOutputs));
+                },
+                sortable: true,
+                removable: true
+            });
+
+            for (var i=0;i<this.filters.length;i++) {
+                var filter = this.filters[i];
+                $("#node-input-filter-container").editableList('addItem',{v: filter, i: i+1});
+            }
+
+            if (! $("#node-input-drawPredictions").is(":checked")) {
+                $("#row-outlineColor").hide();
+                $("#row-printLabel").hide();
+            }
+
+            $("#node-input-drawPredictions").click(function() {
+                $("#row-outlineColor").toggle(this.checked);
+                $("#row-printLabel").toggle(this.checked);
+            });
+        },
+        oneditsave: function() {
+            var filters = $("#node-input-filter-container").editableList('items');
+            var node = this;
+            node.filters = [];
+            filters.each(function(i) {
+                var value = $(this).find(".node-input-filter-value").typedInput('value');
+                node.filters.push(value);
+            });
+            this.propertyType = $("#node-input-property").typedInput('type');
+        },
+        oneditresize: function(size) {
+            var rows = $("#dialog-form>div:not(.node-input-filter-container-row)");
+            var height = size.height;
+            for (var i=0;i<rows.length;i++) {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var editorRow = $("#dialog-form>div.node-input-filter-container-row");
+            height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
+            height += 16;
+            $("#node-input-filter-container").editableList('height',height);
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="deepstack-object-detection">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="icon-tag"></i> Deepstack server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <hr />
+    <div class="form-row">
+        <label for="node-input-confidence"><i class="icon-tag"></i> Minimum Confidence (%)</label>
+        <input type="text" id="node-input-confidence" size="5">
+    </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-drawPredictions" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-drawPredictions" style="width: 90%;">Draw prediction outlines</label>
+    </div>
+    <div class="form-row" id="row-outlineColor" style="padding-left:10%;">
+        <label for="node-input-outlineColor"><i class="icon-tag"></i> Outline color</label>
+        <input type="text" id="node-input-outlineColor">
+    </div>
+    <div class="form-row" id="row-printLabel" style="padding-left:10%;">
+        <input type="checkbox" id="node-input-printLabel" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-printLabel" style="width: 90%;">Print prediction label</label>
+    </div>
+    <div class="form-row">
+        <hr />
+        <p>Filter output</p>
+        <input type="hidden" id="node-input-outputs"/>
+    </div>
+    <div class="form-row node-input-filter-container-row">
+        <ol id="node-input-filter-container"></ol>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="deepstack-object-detection">
+    <p>A node to query the Deepstack Object Detection API.</p>
+
+    <h3>Inputs</h3>
+    <p>The node takes one single input, the image to be processed.</p>
+
+    <dl class="message-properties">
+        <dt>payload
+            <span class="property-type">buffer</span>
+        </dt>
+        <dd> the image buffer to process. </dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <p>One or several outputs can be configured for this node. The default first output is always all predictions.
+    If desired, additional outputs can be configured, filtering the predictions.</p>
+
+    <ol class="node-ports">
+        <li>Standard output
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">object</span></dt>
+                <dd>Deepstack Object Detection predictions.</dd>
+                <dt>success <span class="property-type">boolean</span></dt>
+                <dd>Deepstack Object Detection status.</dd>
+                <dt>originalImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer processed.</dd>
+                <dt>outlinedImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer with rectangular outline around detected objects. Only if config option *drawPredictions* is true.</dd>
+            </dl>
+        </li>
+        <li>Filtered output
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">object</span></dt>
+                <dd>Deepstack Object Detection predictions.</dd>
+                <dt>success <span class="property-type">boolean</span></dt>
+                <dd>Deepstack Object Detection status.</dd>
+                <dt>originalImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer processed.</dd>
+                <dt>outlinedImage <span class="property-type">buffer</span></dt>
+                <dd>the image buffer with rectangular outline around detected objects. Only if config option *drawPredictions* is true.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Details</h3>
+    <p>Sends an image to the Code Project AI 2.06 Image ALPR API and outputs the predictions.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://deepstack.cc/">Deepstack</a> - the service performing the actual magic.</li>
+    </ul>
+</script>
