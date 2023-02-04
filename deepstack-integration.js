@@ -175,6 +175,7 @@ function constructURL(server, endpoint) {
 }
 
 module.exports = {
+    imageALPR,
     objectDetection,
     customModel,
     faceRecognition,
